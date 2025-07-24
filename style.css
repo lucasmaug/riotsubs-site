@@ -244,7 +244,8 @@ footer {
 }
 
 footer nav a {
-  color: #777;
+  color: #8c1f1f;
+  text-decoration: none;
   margin: 0 1rem;
   font-size: 0.9rem;
 }
