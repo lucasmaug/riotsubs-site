@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="home.css" />
   <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700;800&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
   <header>
@@ -59,7 +59,6 @@
 
         <button class="btn btn-primary" id="next-to-options">Continuar</button>
       </div>
-
     </section>
 
     <!-- Etapa 2: Opções -->
@@ -72,28 +71,34 @@
       </div>
 
       <form id="translate-form">
-        <label for="lang">Traduzir para:</label>
-        <p class="form-text-description">Escolha para qual idioma você deseja traduzir sua legenda.</p>
-        <select id="lang" class="select" required>
-          <option value="">Selecione um idioma</option>
-          <option value="pt">Português</option>
-          <option value="en">Inglês</option>
-        </select>
-
-        <label>Tipo de conteúdo (opcional):</label>
-        <p class="form-text-description">Indique o tipo de mídia para uma tradução mais precisa no tom e no contexto.</p>
-        <div class="media-buttons">
-          <button type="button" data-type="Série" class="button">Série</button>
-          <button type="button" data-type="Filme" class="button">Filme</button>
-          <button type="button" data-type="Reality Show" class="button">Reality Show</button>
-          <button type="button" data-type="Documentário" class="button">Documentário</button>
-          <button type="button" data-type="Outro" class="button">Outro</button>
+        <div>
+          <label for="lang">Traduzir para:</label>
+          <p class="form-text-description">Escolha para qual idioma você deseja traduzir sua legenda.</p>
+          <select id="lang" class="select" required>
+            <option value="">Selecione um idioma</option>
+            <option value="pt">Português</option>
+            <option value="en">Inglês</option>
+          </select>
         </div>
-        <input type="hidden" id="media-type" name="media-type" />
 
-        <label for="instructions">Instruções adicionais (opcional):</label>
-        <p class="form-text-description">Inclua observações importantes para adaptar o estilo da legenda, como: manter expressões locais, evitar gírias, usar tom formal etc.</p>
-        <textarea id="instructions" class="textarea" placeholder="Ex: Mantenha o estilo e expressões idiomáticas"></textarea>
+        <div>
+          <label>Tipo de conteúdo (opcional):</label>
+          <p class="form-text-description">Indique o tipo de mídia para uma tradução mais precisa no tom e no contexto.</p>
+          <div class="media-buttons">
+            <button type="button" data-type="Série" class="button">Série</button>
+            <button type="button" data-type="Filme" class="button">Filme</button>
+            <button type="button" data-type="Reality Show" class="button">Reality Show</button>
+            <button type="button" data-type="Documentário" class="button">Documentário</button>
+            <button type="button" data-type="Outro" class="button">Outro</button>
+          </div>
+          <input type="hidden" id="media-type" name="media-type" />
+        </div>
+
+        <div>
+          <label for="instructions">Instruções adicionais (opcional):</label>
+          <p class="form-text-description">Inclua observações importantes para adaptar o estilo da legenda, como: manter expressões locais, evitar gírias, usar tom formal etc.</p>
+          <textarea id="instructions" class="textarea" placeholder="Ex: Mantenha o estilo e expressões idiomáticas"></textarea>
+        </div>
 
         <div class="translate-button">
           <button type="submit" class="btn btn-primary">Traduzir legenda</button>
@@ -115,7 +120,7 @@
       <h2>Tradução feita com sucesso!</h2>
       <p>Clique abaixo para baixar a legenda traduzida.</p>
 
-      <div id="file-info" class="file-info-download">
+      <div class="file-info-download">
         <div class="file-card">
           <div class="file-left">
             <div class="file-icon">SRT</div>
@@ -186,38 +191,46 @@
         document.getElementById("upload-box").classList.add("hidden");
         fileInfo.classList.remove("hidden");
 
-        // Atualiza nome e tamanho do arquivo
-        document.getElementById("file-name").textContent = file.name;
+        const lang = document.getElementById("lang")?.value || "";
+        let fileName = file.name;
+        if (lang === "pt") {
+          const ext = file.name.split('.').pop();
+          const baseName = file.name.replace(/\.[^/.]+$/, "");
+          fileName = `${baseName}-pt-br.${ext}`;
+        }
+        fileNameDisplay.textContent = fileName;
+        document.getElementById("file-name-final").textContent = fileName;
       }
     });
 
     document.getElementById("replace-file").addEventListener("click", () => {
       fileUpload.value = "";
       fileInfo.classList.add("hidden");
+      fileNameDisplay.textContent = "";
       document.getElementById("upload-box").classList.remove("hidden");
     });
 
-
-    document.getElementById("replace-file").addEventListener("click", () => {
-      fileUpload.value = "";
-      fileInfo.classList.add("hidden");
-      fileNameDisplay.textContent = "";
-      document.getElementById("upload-box").classList.remove("hidden"); // MOSTRA A ÁREA DE UPLOAD DE NOVO
-    });
+    const uploadBox = document.getElementById("upload-box");
+    const uploadButton = document.getElementById("upload-btn");
+    const dropMessage = document.getElementById("drop-message");
 
     ['dragenter', 'dragover'].forEach(eventName => {
-      dropArea.addEventListener(eventName, e => {
+      uploadBox.addEventListener(eventName, e => {
         e.preventDefault();
         e.stopPropagation();
-        dropArea.classList.add("dragover");
+        uploadBox.classList.add("dragover");
+        dropMessage.textContent = "Solte aqui para começar a tradução";
+        uploadButton.style.display = "none"; // Esconde o botão
       });
     });
 
     ['dragleave', 'drop'].forEach(eventName => {
-      dropArea.addEventListener(eventName, e => {
+      uploadBox.addEventListener(eventName, e => {
         e.preventDefault();
         e.stopPropagation();
-        dropArea.classList.remove("dragover");
+        uploadBox.classList.remove("dragover");
+        dropMessage.textContent = "Clique ou arraste o arquivo .SRT aqui";
+        uploadButton.style.display = "inline-block"; // Mostra o botão de novo
       });
     });
 
@@ -229,8 +242,18 @@
         fileUpload.files = files;
         const file = files[0];
         fileInfo.classList.remove("hidden");
-        fileNameDisplay.textContent = file.name;
-        document.getElementById("file-name-final").textContent = file.name;
+        document.getElementById("upload-box").classList.add("hidden");
+
+        const lang = document.getElementById("lang")?.value || "";
+        let fileName = file.name;
+        if (lang === "pt") {
+          const ext = file.name.split('.').pop();
+          const baseName = file.name.replace(/\.[^/.]+$/, "");
+          fileName = `${baseName}-pt-br.${ext}`;
+        }
+
+        fileNameDisplay.textContent = fileName;
+        document.getElementById("file-name-final").textContent = fileName;
       }
     });
 
@@ -254,11 +277,14 @@
 
       let progress = 0;
       const interval = setInterval(() => {
-        progress += 1;
-        progressFill.style.width = progress + "%";
-        progressFill.textContent = progress + "%";
-        if (progress >= 100) {
+        if (progress < 100) {
+          progress += 1;
+          progressFill.style.width = progress + "%";
+          progressFill.textContent = progress + "%";
+        } else {
           clearInterval(interval);
+          progressFill.style.width = "100%";
+          progressFill.textContent = "100%";
           stepProgress.classList.add("hidden");
           stepFinal.classList.remove("hidden");
         }
@@ -278,6 +304,5 @@
       stepUpload.classList.remove("hidden");
     }
   </script>
-
 </body>
 </html>
