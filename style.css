@@ -1,0 +1,253 @@
+/* --- COMPONENTES PADRÃO STYLEGUIDE --- */
+
+/* Reset e base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Epilogue', sans-serif;
+  background-color: #f2f2f2;
+  color: #1a1a1a;
+  line-height: 1.6;;
+}
+
+/* Links */
+a {
+  color: #8c1f1f;
+  text-decoration: none;
+  font-weight: 500;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* Header */
+header {
+  background-color: #ffffff;
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+}
+
+.logo {
+  font-size: 2rem;
+  font-weight: 600;
+  font-family: 'Epilogue', sans-serif;
+  color: #1a1a1a;
+  letter-spacing: -1px;
+
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo img {
+  height: 40px;
+  display: block;
+}
+
+.logo span {
+  font-family: 'Epilogue', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1f1f1f;
+  text-decoration: none;
+  align-self: end;
+}
+
+nav a {
+  margin-left: 2rem;
+}
+
+/* Main */
+main {
+  max-width: 1000px;
+  margin: 3rem auto;
+  padding: 0 1.5rem;
+}
+
+.hero {
+    text-align: center;
+}
+
+/* Títulos */
+h1 {
+  font-family: 'Epilogue', sans-serif;
+  font-weight: 600;
+  letter-spacing: -1px;
+  font-size: 3rem;
+  letter-spacing: -2px;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+
+h2 {
+  font-family: 'Epilogue', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  letter-spacing: 0;
+}
+
+.subtitle, p, li {
+  font-family: 'Sora', sans-serif;
+  color: #555;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Botão padrão */
+/* Botão base */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1.25rem;
+  font-family: 'Epilogue', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: none;
+  text-align: center;
+  text-decoration: none;
+}
+
+/* Primary */
+.btn-primary {
+  background-color: #1f1f1f;
+  color: #fff;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #111;
+}
+
+.btn-primary:disabled {
+  background-color: #d4d4d4;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+/* Secondary */
+.btn-secondary {
+  background-color: transparent;
+  color: #1f1f1f;
+  border: 1.5px solid #ccc;
+}
+
+.btn-secondary:hover {
+  background-color: #eee;
+}
+
+.btn-secondary:disabled {
+  color: #aaa;
+  border-color: #d4d4d4;
+  background-color: #f2f2f2;
+  cursor: not-allowed;
+}
+
+/* Ghost */
+.btn-ghost {
+  background-color: transparent;
+  color: #333;
+  border: none;
+}
+
+.btn-ghost:hover {
+  background-color: #f9f9f9;
+}
+
+.btn-ghost:disabled {
+  color: #bbb;
+  cursor: not-allowed;
+}
+
+
+/* Checkbox com label estilizada */
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  background-color: #1a1a1a;
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-family: 'Epilogue', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  gap: 0.5rem;
+}
+.checkbox-label input[type="checkbox"] {
+  accent-color: #fff;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Select */
+.select {
+  background-color: #fff;
+  color: #111;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-family: 'Epilogue', sans-serif;
+  padding-right: 2.5rem; /* aumenta espaço interno à direita */
+  background-position: right 1rem center; /* ajusta posição da seta */
+  background-repeat: no-repeat;
+  background-size: 1rem;
+  appearance: none; /* remove o estilo nativo do navegador */
+  background-image: url("icon/crevron-down.svg");
+}
+
+/* Textarea */
+.textarea {
+  background-color: #fff;
+  color: #111;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-family: 'Epilogue', sans-serif;
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* Input de texto */
+.input {
+  background-color: #fff;
+  color: #111;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-family: 'Epilogue', sans-serif;
+}
+
+
+/* Footer */
+footer {
+  background: #f6f6f6;
+  padding: 2rem;
+  text-align: center;
+  font-size: 0.85rem;
+  border-top: 1px solid #ccc;
+  color: #777;
+}
+
+footer nav a {
+  color: #777;
+  margin: 0 1rem;
+  font-size: 0.9rem;
+}
+footer nav a:hover {
+  color: #1a1a1a;
+}

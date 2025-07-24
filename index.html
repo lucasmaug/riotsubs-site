@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Tradutor de legendas .SRT com inteligência artificial e contexto cultural. Tradução natural e personalizada online e gratuita." />
+  <title>RiotSubs - Tradutor de Legendas</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="home.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700;800&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <a href="index.html" class="logo">
+      <img src="assets/logoName.svg" alt="Logo RiotSubs"/>
+    </a>
+    <nav>
+      <a href="index.html">Início</a>
+      <a href="about.html">Sobre</a>
+      <a href="faq.html">Como usar</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>RiotSubs - Tradutor de Legendas</h1>
+      <p>Traduza online e grátis legendas de séries, reality shows e filmes</p>
+    </section>
+
+    <!-- Etapa 1: Upload -->
+    <section id="step-upload">
+      <div class="upload-header">
+        <h2>Traduza sua legenda</h2>
+        <p>Para começar, envie sua legenda para ser traduzida</p>
+      </div>
+
+      <div class="drop-area" id="upload-box">
+        <input type="file" id="file-upload" accept=".srt" hidden />
+        <div class="drop-zone" id="drop-area">
+          <img src="icon/upload.svg" alt="Upload"/>
+          <p id="drop-message">Clique ou arraste o arquivo .SRT aqui</p>
+          <button type="button" class="btn btn-primary" id="upload-btn">Carregar seu arquivo</button>
+        </div>
+      </div>
+
+      <div id="file-info" class="hidden">
+        <div class="file-card">
+          <div class="file-left">
+            <div class="file-icon">SRT</div>
+            <div class="file-details">
+              <p id="file-name" class="file-name">nome-do-arquivo.srt</p>
+            </div>
+          </div>
+          <button id="replace-file" class="file-remove" title="Remover">
+            <img src="icon/trash.svg" alt="Deletar">
+          </button>
+        </div>
+
+        <button class="btn btn-primary" id="next-to-options">Continuar</button>
+      </div>
+
+    </section>
+
+    <!-- Etapa 2: Opções -->
+    <section id="step-options" class="hidden">
+      <div class="back-button-wrapper">
+        <button type="button" class="btn btn-secondary back-button" onclick="goBack()">
+          <img src="icon/arrow-back.svg" alt="Voltar">
+        </button>
+        <h2>Personalize sua tradução</h2>
+      </div>
+
+      <form id="translate-form">
+        <label for="lang">Traduzir para:</label>
+        <p class="form-text-description">Escolha para qual idioma você deseja traduzir sua legenda.</p>
+        <select id="lang" class="select" required>
+          <option value="">Selecione um idioma</option>
+          <option value="pt">Português</option>
+          <option value="en">Inglês</option>
+        </select>
+
+        <label>Tipo de conteúdo (opcional):</label>
+        <p class="form-text-description">Indique o tipo de mídia para uma tradução mais precisa no tom e no contexto.</p>
+        <div class="media-buttons">
+          <button type="button" data-type="Série" class="button">Série</button>
+          <button type="button" data-type="Filme" class="button">Filme</button>
+          <button type="button" data-type="Reality Show" class="button">Reality Show</button>
+          <button type="button" data-type="Documentário" class="button">Documentário</button>
+          <button type="button" data-type="Outro" class="button">Outro</button>
+        </div>
+        <input type="hidden" id="media-type" name="media-type" />
+
+        <label for="instructions">Instruções adicionais (opcional):</label>
+        <p class="form-text-description">Inclua observações importantes para adaptar o estilo da legenda, como: manter expressões locais, evitar gírias, usar tom formal etc.</p>
+        <textarea id="instructions" class="textarea" placeholder="Ex: Mantenha o estilo e expressões idiomáticas"></textarea>
+
+        <div class="translate-button">
+          <button type="submit" class="btn btn-primary">Traduzir legenda</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Etapa 3: Progresso -->
+    <section id="step-progress" class="hidden">
+      <h2>Traduzindo...</h2>
+      <div class="progress-bar">
+        <div id="progress-fill" class="fill">0%</div>
+      </div>
+      <button id="cancel-progress" class="btn btn-secondary">Cancelar tradução</button>
+    </section>
+
+    <!-- Etapa 4: Final -->
+    <section id="step-final" class="hidden">
+      <h2>Tradução feita com sucesso!</h2>
+      <p>Clique abaixo para baixar a legenda traduzida.</p>
+
+      <div id="file-info" class="file-info-download">
+        <div class="file-card">
+          <div class="file-left">
+            <div class="file-icon">SRT</div>
+            <div class="file-details">
+              <p id="file-name-final" class="file-name">nome-do-arquivo.srt</p>
+            </div>
+          </div>
+          <a href="#" id="download-file" class="file-download" title="Baixar legenda traduzida">
+            <img src="icon/download.svg" alt="Download">
+          </a>
+        </div>
+
+        <button id="restart-process" class="btn btn-secondary">Traduzir nova legenda</button>
+      </div>
+    </section>
+
+    <!-- Sobre -->
+    <section>
+      <div>
+        <h2>O que é RiotSubs?</h2>
+        <p>O RiotSubs é uma ferramenta gratuita que usa inteligência artificial para traduzir arquivos de legenda .SRT de forma mais natural, contextual e precisa. Diferente de tradutores automáticos comuns, aqui você pode fornecer informações sobre o tipo de conteúdo — como filmes, séries, reality shows ou documentários — e adicionar instruções de tradução personalizadas.</p>
+      </div>
+    </section>
+
+    <section>
+      <div>
+        <h2>Traduza legendas SRT em 3 passos simples</h2>
+        <ol class="step-list">
+          <li>Faça upload do arquivo de legenda no formato .SRT</li>
+          <li>Escolha o idioma e personalize a tradução</li>
+          <li>Baixe o arquivo SRT traduzido</li>
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <nav>
+      <a href="about.html">Sobre</a>
+      <a href="faq.html">Como usar</a>
+      <a href="termos-e-privacidade.html">Termos de uso e Privacidade</a>
+    </nav>
+  </footer>
+
+  <script>
+    const fileUpload = document.getElementById("file-upload");
+    const fileInfo = document.getElementById("file-info");
+    const fileNameDisplay = document.getElementById("file-name");
+    const nextToOptions = document.getElementById("next-to-options");
+    const stepUpload = document.getElementById("step-upload");
+    const stepOptions = document.getElementById("step-options");
+    const stepProgress = document.getElementById("step-progress");
+    const stepFinal = document.getElementById("step-final");
+    const progressFill = document.getElementById("progress-fill");
+    const uploadBtn = document.getElementById("upload-btn");
+    const dropArea = document.getElementById("drop-area");
+
+    const mediaButtons = document.querySelectorAll(".media-buttons button");
+    const mediaTypeInput = document.getElementById("media-type");
+
+    uploadBtn.addEventListener("click", () => {
+      fileUpload.click();
+    });
+
+    fileUpload.addEventListener("change", () => {
+      const file = fileUpload.files[0];
+      if (file) {
+        document.getElementById("upload-box").classList.add("hidden");
+        fileInfo.classList.remove("hidden");
+
+        // Atualiza nome e tamanho do arquivo
+        document.getElementById("file-name").textContent = file.name;
+      }
+    });
+
+    document.getElementById("replace-file").addEventListener("click", () => {
+      fileUpload.value = "";
+      fileInfo.classList.add("hidden");
+      document.getElementById("upload-box").classList.remove("hidden");
+    });
+
+
+    document.getElementById("replace-file").addEventListener("click", () => {
+      fileUpload.value = "";
+      fileInfo.classList.add("hidden");
+      fileNameDisplay.textContent = "";
+      document.getElementById("upload-box").classList.remove("hidden"); // MOSTRA A ÁREA DE UPLOAD DE NOVO
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, e => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropArea.classList.add("dragover");
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, e => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropArea.classList.remove("dragover");
+      });
+    });
+
+    dropArea.addEventListener("drop", e => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+
+      if (files.length) {
+        fileUpload.files = files;
+        const file = files[0];
+        fileInfo.classList.remove("hidden");
+        fileNameDisplay.textContent = file.name;
+        document.getElementById("file-name-final").textContent = file.name;
+      }
+    });
+
+    nextToOptions.addEventListener("click", () => {
+      stepUpload.classList.add("hidden");
+      stepOptions.classList.remove("hidden");
+    });
+
+    mediaButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        mediaButtons.forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        mediaTypeInput.value = btn.dataset.type;
+      });
+    });
+
+    document.getElementById("translate-form").addEventListener("submit", e => {
+      e.preventDefault();
+      stepOptions.classList.add("hidden");
+      stepProgress.classList.remove("hidden");
+
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 1;
+        progressFill.style.width = progress + "%";
+        progressFill.textContent = progress + "%";
+        if (progress >= 100) {
+          clearInterval(interval);
+          stepProgress.classList.add("hidden");
+          stepFinal.classList.remove("hidden");
+        }
+      }, 40);
+    });
+
+    document.getElementById("cancel-progress").addEventListener("click", () => {
+      location.reload();
+    });
+
+    document.getElementById("restart-process").addEventListener("click", () => {
+      location.reload();
+    });
+
+    function goBack() {
+      stepOptions.classList.add("hidden");
+      stepUpload.classList.remove("hidden");
+    }
+  </script>
+
+</body>
+</html>

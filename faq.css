@@ -1,0 +1,78 @@
+/* Estilização extra apenas para a tela FAQ / Como usar */
+
+.step-list,
+.bullet-list {
+  padding-left: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.step-list li {
+  margin-bottom: 0.5rem;
+}
+
+.bullet-list li {
+  margin-bottom: 0.3rem;
+}
+
+.content-section {
+  margin-bottom: 3rem;
+}
+
+.faq-item {
+  background: #fff;
+  margin-bottom: 1rem;
+  padding: 0rem 1rem;
+  transition: all 0.3s ease;
+  text-align: left;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  font-family: 'Sora', sans-serif;
+  color: #333;
+}
+
+.faq-item[open] {
+  background-color: #f9f9f9;
+}
+
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-family: 'Epilogue', sans-serif;
+  padding: 1rem 1.25rem;
+  font-size: 1rem;
+  color: #1a1a1a;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  list-style: none;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+.faq-item summary::marker {
+  display: none;
+}
+
+.faq-item summary::after {
+  content: "";
+  width: 32px;
+  height: 32px;
+  background-image: url("icon/crevron-down.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  transition: transform 0.3s ease;
+}
+
+.faq-item[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.faq-item p {
+  margin-top: 0.5rem;
+  color: #333;
+  font-family: 'Sora', sans-serif;
+  font-size: 1rem;
+  padding: 0 1.25rem 1rem;
+}
