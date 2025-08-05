@@ -5,15 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Tradutor de legendas .SRT com inteligência artificial e contexto cultural. Tradução natural e personalizada online e gratuita." />
   <title>RiotSubs - Tradutor de Legendas</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="home.css" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="stylesheet" href="/static/css/home.css" />
   <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
   <header>
     <a href="index.html" class="logo">
-      <img src="assets/logoName.svg" alt="Logo RiotSubs"/>
+      <img src="/static/assets/logoName.svg" alt="Logo RiotSubs"/>
     </a>
     <nav>
       <a href="index.html">Início</a>
@@ -38,7 +38,7 @@
       <div class="drop-area" id="upload-box">
         <input type="file" id="file-upload" accept=".srt" hidden />
         <div class="drop-zone" id="drop-area">
-          <img src="icon/upload.svg" alt="Upload"/>
+          <img src="/static/icons/upload.svg" alt="Upload"/>
           <p id="drop-message">Clique ou arraste o arquivo .SRT aqui</p>
           <button type="button" class="btn btn-primary" id="upload-btn">Carregar seu arquivo</button>
         </div>
@@ -53,7 +53,7 @@
             </div>
           </div>
           <button id="replace-file" class="file-remove" title="Remover">
-            <img src="icon/trash.svg" alt="Deletar">
+            <img src="/static/icons/trash.svg" alt="Deletar">
           </button>
         </div>
 
@@ -65,7 +65,7 @@
     <section id="step-options" class="hidden">
       <div class="back-button-wrapper">
         <button type="button" class="btn btn-secondary back-button" onclick="goBack()">
-          <img src="icon/arrow-back.svg" alt="Voltar">
+          <img src="/static/icons/arrow-back.svg" alt="Voltar">
         </button>
         <h2>Personalize sua tradução</h2>
       </div>
@@ -129,7 +129,7 @@
             </div>
           </div>
           <a href="#" id="download-file" class="file-download" title="Baixar legenda traduzida">
-            <img src="icon/download.svg" alt="Download">
+            <img src="/static/icons/download.svg" alt="Download">
           </a>
         </div>
 
