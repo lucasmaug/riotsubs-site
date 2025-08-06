@@ -9,8 +9,10 @@ import uuid
 # Carrega as variáveis de ambiente
 load_dotenv()
 
-DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"  # Verifique se esta é a URL correta
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
+# Desativamos a API real para usar o mock
+USE_MOCK_API = True  # Alterar para False quando quiser usar a API real
+DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions" if not USE_MOCK_API else None
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY") if not USE_MOCK_API else None
 UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
 ALLOWED_EXTENSIONS = {'srt'}
 MAX_FILE_SIZE = 2 * 1024 * 1024  # 2MB
@@ -48,8 +50,8 @@ def handle_upload():
         # Lê o conteúdo do SRT
         srt_content = read_srt_file(filepath)
         
-        # Chama a API de tradução
-        translated_content = translate_with_deepseek(srt_content)
+        # Chama a API de tradução (ou mock)
+        translated_content = mock_translate_with_deepseek(srt_content) if USE_MOCK_API else translate_with_deepseek(srt_content)
         
         # Salva a tradução
         translated_filename = f"traduzido_{filename}"
@@ -70,15 +72,13 @@ def handle_upload():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Função para ler arquivos SRT
 def read_srt_file(filepath):
     """Lê o conteúdo de um arquivo SRT e retorna o texto para tradução"""
     with open(filepath, 'r', encoding='utf-8') as f:
         return f.read()
     
-# Função para chamar a API do DeepSeek
 def translate_with_deepseek(text):
-    """Envia texto para a API do DeepSeek e retorna a tradução"""
+    """Função original que chama a API real do DeepSeek"""
     if not DEEPSEEK_API_KEY:
         raise ValueError("Chave API não configurada")
     
@@ -87,7 +87,6 @@ def translate_with_deepseek(text):
         "Content-Type": "application/json"
     }
     
-    # Instrução mais clara para a API
     system_prompt = """Você é um tradutor profissional de legendas SRT. 
     Sua tarefa é traduzir APENAS o texto dos diálogos, mantendo:
     - Números de sequência intactos
@@ -101,7 +100,7 @@ def translate_with_deepseek(text):
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": f"Traduza este SRT para português:\n\n{text}"}
         ],
-        "temperature": 0.1  # Menor = mais preciso
+        "temperature": 0.1
     }
     
     try:
@@ -109,9 +108,9 @@ def translate_with_deepseek(text):
             DEEPSEEK_API_URL,
             headers=headers,
             json=payload,
-            timeout=30  # 30 segundos de timeout
+            timeout=30
         )
-        response.raise_for_status()  # Levanta erro para status 4xx/5xx
+        response.raise_for_status()
         
         return response.json()["choices"][0]["message"]["content"]
         
@@ -120,17 +119,49 @@ def translate_with_deepseek(text):
         print(f"Resposta da API: {e.response.text if e.response else 'Sem resposta'}")
         raise
 
-# Adicição de rota para download 
+def mock_translate_with_deepseek(text):
+    """Mock da API DeepSeek que simula a tradução sem chamar a API real"""
+    print("Usando MOCK da API DeepSeek - nenhum crédito será gasto")
+    
+    # Simula um pequeno atraso como se fosse uma chamada de API
+    import time
+    time.sleep(1)
+    
+    # Simplesmente adiciona "[TRADUZIDO] " antes de cada linha de diálogo
+    lines = text.split('\n')
+    translated_lines = []
+    
+    for i, line in enumerate(lines):
+        # Mantém números de sequência e timestamps inalterados
+        if line.strip().isdigit() or '-->' in line:
+            translated_lines.append(line)
+        # Traduz linhas de diálogo (simulação)
+        elif line.strip() and (i == 0 or lines[i-1].strip() == '' or '-->' in lines[i-1]):
+            translated_lines.append(f"[TRADUZIDO] {line}")
+        else:
+            translated_lines.append(line)
+    
+    return '\n'.join(translated_lines)
+
 @app.route('/download/<filename>')
 def download_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
 
-# Suas rotas existentes...
 @app.route("/")
 def home():
     return render_template("index.html")
 
-# ... outras rotas ...
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+@app.route("/faq")
+def faq():
+    return render_template("faq.html")
+
+@app.route("/termos-e-privacidade")
+def termos():
+    return render_template("termos-e-privacidade.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
