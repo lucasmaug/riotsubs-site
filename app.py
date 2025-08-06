@@ -19,10 +19,6 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 
-@app.route("/")
-def hello():
-    return "Hello, RiotSubs no ar!"
-
 # Cria pasta se não existir
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
