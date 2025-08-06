@@ -8,7 +8,7 @@ export function setupFileUpload() {
 
   // 2. Configura o clique no botão
   uploadBtn.addEventListener("click", () => {
-    fileUpload.click(); // Dispara o input file oculto
+    fileUpload.click();
   });
 
   // 3. Quando o usuário seleciona um arquivo
@@ -30,13 +30,26 @@ export function setupFileUpload() {
       fileNameDisplay.textContent = fileName;
       document.getElementById("file-name-final").textContent = fileName;
       
-      // 4. ENVIA O ARQUIVO PARA O BACKEND (nova parte)
-      uploadFile(file).then(response => {
+      // 4. ENVIA O ARQUIVO PARA O BACKEND
+      try {
+        const response = await uploadFile(file);
         console.log("Upload completo:", response);
-        // Aqui você pode adicionar mais lógica após o upload
-      });
+        
+        if (response.success) {
+          // Mostra o link de download
+          const downloadLink = document.getElementById('download-link');
+          downloadLink.href = response.download_url;
+          downloadLink.classList.remove('hidden');
 
-      await uploadFile(file);
+          // Atualiza o nome do arquivo
+          document.getElementById('file-name-final').textContent = response.translated;
+        } else {
+          alert('Erro: ' + response.error);
+        }
+      } catch (error) {
+        console.error('Erro no upload:', error);
+        alert('Ocorreu um erro durante o upload');
+      }
     }
   });
 
@@ -46,23 +59,29 @@ export function setupFileUpload() {
     fileInfo.classList.add("hidden");
     fileNameDisplay.textContent = "";
     document.getElementById("upload-box").classList.remove("hidden");
+    
+    // Esconde o link de download se estiver visível
+    const downloadLink = document.getElementById('download-link');
+    if (!downloadLink.classList.contains('hidden')) {
+      downloadLink.classList.add('hidden');
+    }
   });
 }
 
-// 6. Função que faz o upload REAL para o servidor
+// Função que faz o upload REAL para o servidor
 export async function uploadFile(file) {
   const formData = new FormData();
-  formData.append('srt_file', file); // Corresponde ao name do input
+  formData.append('srt_file', file);
+  formData.append('lang', document.getElementById('lang')?.value || 'pt');
   
   try {
     const response = await fetch('/upload', {
       method: 'POST',
       body: formData
-      // O cabeçalho Content-Type é definido automaticamente como multipart/form-data
     });
-    return await response.json(); // Converte a resposta para JSON
+    return await response.json();
   } catch (error) {
     console.error('Erro no upload:', error);
-    throw error; // Permite que outros tratem o erro
+    throw error;
   }
 }
