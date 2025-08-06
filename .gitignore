@@ -1,4 +1,12 @@
+# Arquivos sensíveis
+.env
+*.key
+
+# Python
 venv/
 __pycache__/
 *.pyc
-.env
+
+# Uploads
+uploads/*
+!uploads/.gitkeep
