@@ -7,12 +7,7 @@ from src.translation_service import TranslationService
 
 def create_app():
     """Cria e configura a aplicação Flask"""
-    app = Flask(__name__, 
-                template_folder='../templates',
-                static_folder='../static')
-    
-    app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
-    app.config['MAX_CONTENT_LENGTH'] = Config.MAX_FILE_SIZE
+    app = Flask(__name__)
     
     # Valida configurações
     Config.validate_config()
