@@ -29,31 +29,10 @@ export function setupFileUpload() {
       }
       fileNameDisplay.textContent = fileName;
       document.getElementById("file-name-final").textContent = fileName;
-      
-      // 4. ENVIA O ARQUIVO PARA O BACKEND
-      try {
-        const response = await uploadFile(file);
-        console.log("Upload completo:", response);
-        
-        if (response.success) {
-          // Mostra o link de download
-          const downloadLink = document.getElementById('download-link');
-          downloadLink.href = response.download_url;
-          downloadLink.classList.remove('hidden');
-
-          // Atualiza o nome do arquivo
-          document.getElementById('file-name-final').textContent = response.translated;
-        } else {
-          alert('Erro: ' + response.error);
-        }
-      } catch (error) {
-        console.error('Erro no upload:', error);
-        alert('Ocorreu um erro durante o upload');
-      }
     }
   });
 
-  // 5. Configura o botão "Substituir arquivo"
+  // 4. Configura o botão "Substituir arquivo"
   document.getElementById("replace-file").addEventListener("click", () => {
     fileUpload.value = "";
     fileInfo.classList.add("hidden");
@@ -66,22 +45,4 @@ export function setupFileUpload() {
       downloadLink.classList.add('hidden');
     }
   });
-}
-
-// Função que faz o upload REAL para o servidor
-export async function uploadFile(file) {
-  const formData = new FormData();
-  formData.append('srt_file', file);
-  formData.append('lang', document.getElementById('lang')?.value || 'pt');
-  
-  try {
-    const response = await fetch('/upload', {
-      method: 'POST',
-      body: formData
-    });
-    return await response.json();
-  } catch (error) {
-    console.error('Erro no upload:', error);
-    throw error;
-  }
 }

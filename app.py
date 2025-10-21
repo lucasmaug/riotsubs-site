@@ -37,10 +37,65 @@ def create_app():
     def termos():
         return render_template("termos-e-privacidade.html")
     
-    # ===== ROTA DE UPLOAD =====
+    @app.route('/start-translation', methods=['POST'])
+    def start_translation():
+        """Inicia uma tradução com chunks paralelos"""
+        try:
+            uploaded_file = request.files.get('srt_file')
+            original_filename = validation_service.validate_file_upload(uploaded_file)
+            
+            # Salva o arquivo temporariamente
+            filepath, unique_filename = file_service.save_uploaded_file(
+                uploaded_file, 
+                original_filename
+            )
+            
+            # Inicia a tradução assíncrona com chunks
+            translation_id = translation_service.start_translation(
+                filepath, original_filename, unique_filename
+            )
+            
+            return jsonify({
+                'success': True,
+                'translation_id': translation_id,
+                'message': 'Tradução iniciada com processamento paralelo'
+            })
+            
+        except Exception as e:
+            return jsonify({'error': str(e)}), 400
+    
+    @app.route('/translation-status/<translation_id>')
+    def translation_status(translation_id):
+        """Retorna o status detalhado de uma tradução com chunks"""
+        try:
+            status = translation_service.get_translation_status(translation_id)
+            
+            if not status:
+                return jsonify({'error': 'Tradução não encontrada'}), 404
+            
+            response_data = {
+                'status': status.get('status', 'unknown'),
+                'progress': status.get('progress', 0),
+                'message': status.get('message', ''),
+                'translated_filename': status.get('translated_filename'),
+                'download_url': status.get('download_url'),
+                'error': status.get('error')
+            }
+            
+            # Adiciona informações de chunks se disponível
+            if 'chunks_processed' in status and 'total_chunks' in status:
+                response_data['chunks_processed'] = status['chunks_processed']
+                response_data['total_chunks'] = status['total_chunks']
+            
+            return jsonify(response_data)
+            
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+    
+    # ===== ROTA DE UPLOAD LEGADO (mantida para compatibilidade) =====
     @app.route('/upload', methods=['POST'])
     def handle_upload():
-        """Processa o upload e tradução de arquivos SRT"""
+        """Processa o upload e tradução de arquivos SRT (método legado)"""
         try:
             # Validação do upload
             uploaded_file = request.files.get('srt_file')
