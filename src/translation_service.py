@@ -214,7 +214,12 @@ class TranslationService:
             raise Exception(f"API retornou {response.status_code}: {response.text}")
 
         data = response.json()
-        return data["choices"][0]["message"]["content"]
+        raw = data["choices"][0]["message"]["content"]
+
+        # Valida e limpa a resposta — remove markdown, texto explicativo, etc.
+        from src.validation_service import ValidationService
+        validator = ValidationService(set(), 0)
+        return validator.validate_api_response(raw)
 
     def _mock_translate_chunk(self, chunk_content):
         """Mock para desenvolvimento — não chama API real."""
