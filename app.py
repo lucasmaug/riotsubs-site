@@ -50,6 +50,14 @@ def create_app():
     def termos():
         return render_template('termos-e-privacidade.html')
 
+    @app.route('/favicon.ico')
+    def favicon():
+        return send_from_directory(
+            os.path.join(app.root_path, 'static', 'icons'),
+            'favicon.png',
+            mimetype='image/png',
+        )
+
     @app.route('/ping')
     def ping():
         return 'OK', 200
