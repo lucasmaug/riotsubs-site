@@ -61,29 +61,22 @@ class FileService:
         content = re.sub(r'(\d{2}:\d{2}:\d{2})\.(\d{3})', r'\1,\2', content)
         return content
 
-    def save_translated_file(self, content, original_unique_filename, lang='pt-br'):
+    def save_translated_file(self, content, original_filename, lang='pt-br'):
         """
         Salva o conteúdo traduzido com nome que reflete o idioma.
 
         Exemplo:
-          original_unique_filename = 'a1b2c3d4_Euphoria.S03E01.XviD.srt'
+          original_filename = 'Euphoria.S03E01.XviD.srt'
           lang = 'pt-br'
           → resultado = 'Euphoria.S03E01.XviD-pt-br.srt'
-
-        O prefixo uuid gerado no upload é removido do nome final para que
-        o utilizador receba um ficheiro com nome limpo.
         """
-        # Remove o prefixo único (8 hex chars + underscore) se existir
-        clean_name = re.sub(r'^[0-9a-f]{8}_', '', original_unique_filename)
-
-        # Insere o sufixo de idioma antes da extensão
         suffix = LANG_SUFFIX.get(lang, f'-{lang}')
-        dot_idx = clean_name.rfind('.')
+        dot_idx = original_filename.rfind('.')
         if dot_idx == -1:
-            base, ext = clean_name, '.srt'
+            base, ext = original_filename, '.srt'
         else:
-            base = clean_name[:dot_idx]
-            ext  = clean_name[dot_idx:]   # inclui o ponto
+            base = original_filename[:dot_idx]
+            ext  = original_filename[dot_idx:]
 
         translated_filename = f'{base}{suffix}{ext}'
         translated_path     = os.path.join(self.upload_folder, translated_filename)

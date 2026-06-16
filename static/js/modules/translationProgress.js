@@ -1,9 +1,9 @@
-import { buildOutputFilename } from './fileUpload.js';
-
 export function setupTranslationProgress() {
   const stepOptions  = document.getElementById('step-options');
   const stepProgress = document.getElementById('step-progress');
   const stepFinal    = document.getElementById('step-final');
+
+  let currentTranslationId = null;
 
   document.getElementById('translate-form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -23,11 +23,12 @@ export function setupTranslationProgress() {
     stepProgress.classList.remove('hidden');
 
     try {
-      const response = await uploadFileWithProgress(file, lang, mediaType, instructions);
+      const response = await uploadFileWithProgress(
+        file, lang, mediaType, instructions, (id) => { currentTranslationId = id; }
+      );
 
       if (response.success) {
-        // Nome do arquivo de download com sufixo de idioma
-        const outputName = buildOutputFilename(file.name, lang);
+        const outputName = response.translated_filename || file.name;
 
         const downloadLink = document.getElementById('download-link');
         downloadLink.href = response.download_url;
@@ -49,12 +50,17 @@ export function setupTranslationProgress() {
     }
   });
 
-  document.getElementById('cancel-progress').addEventListener('click', () => location.reload());
+  document.getElementById('cancel-progress').addEventListener('click', async () => {
+    if (currentTranslationId) {
+      await fetch(`/cancel-translation/${currentTranslationId}`, { method: 'POST' });
+    }
+    location.reload();
+  });
   document.getElementById('restart-process').addEventListener('click', () => location.reload());
 }
 
 // ─── Upload + início da tradução assíncrona ───────────────────────────────────
-async function uploadFileWithProgress(file, lang, mediaType, instructions) {
+async function uploadFileWithProgress(file, lang, mediaType, instructions, onStarted) {
   const formData = new FormData();
   formData.append('srt_file', file);
   formData.append('lang', lang);
@@ -68,6 +74,8 @@ async function uploadFileWithProgress(file, lang, mediaType, instructions) {
 
   const startData = await startResponse.json();
   if (!startData.success) throw new Error(startData.error || 'Erro ao iniciar tradução.');
+
+  if (onStarted) onStarted(startData.translation_id);
 
   return monitorTranslationProgress(startData.translation_id);
 }
@@ -96,11 +104,14 @@ function monitorTranslationProgress(translationId) {
 
         if (status.status === 'completed') {
           resolve({
-            success:      true,
-            download_url: status.download_url,
+            success:             true,
+            download_url:        status.download_url,
+            translated_filename: status.translated_filename,
           });
         } else if (status.status === 'error') {
           reject(new Error(status.error || 'Erro na tradução.'));
+        } else if (status.status === 'cancelled') {
+          reject(new Error('Tradução cancelada.'));
         } else {
           setTimeout(check, 1000);
         }

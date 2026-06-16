@@ -4,6 +4,8 @@ from urllib3.util.retry import Retry
 import uuid
 import re
 import threading
+import time
+from urllib.parse import quote
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from src.config import Config
 
@@ -43,6 +45,8 @@ class TranslationService:
 
     def start_translation(self, filepath, original_filename, unique_filename,
                           lang='pt-br', media_type='', instructions=''):
+        self._cleanup_old_translations()
+
         translation_id = str(uuid.uuid4())
 
         self.active_translations[translation_id] = {
@@ -72,7 +76,10 @@ class TranslationService:
 
     def cancel_translation(self, translation_id):
         if translation_id in self.active_translations:
-            self.active_translations[translation_id]['status'] = 'cancelled'
+            self.active_translations[translation_id].update({
+                'status': 'cancelled',
+                'finished_at': time.time(),
+            })
             return True
         return False
 
@@ -140,6 +147,9 @@ class TranslationService:
                 }
 
                 for future in as_completed(futures):
+                    if td['status'] == 'cancelled':
+                        break
+
                     index, translated_text = future.result()
 
                     with lock:
@@ -159,6 +169,10 @@ class TranslationService:
                         f'Traduzindo... ({done_count}/{total} blocos)',
                     )
 
+            if td['status'] == 'cancelled':
+                td['finished_at'] = time.time()
+                return
+
             # Reconstrói na ordem original
             self._update_progress(translation_id, 90, 'Montando arquivo final...')
             final_content = '\n\n'.join(results[i] for i in range(total))
@@ -166,7 +180,7 @@ class TranslationService:
             # Salva com nome que já reflete o idioma
             translated_filename = file_service.save_translated_file(
                 final_content,
-                td['unique_filename'],
+                td['original_filename'],
                 lang=lang,
             )
 
@@ -178,13 +192,14 @@ class TranslationService:
             td.update({
                 'status':              'completed',
                 'translated_filename': translated_filename,
-                'download_url':        f'/download/{translated_filename}',
+                'download_url':        f'/download/{quote(translated_filename)}',
                 'failed_chunks':       failed_chunks,
+                'finished_at':         time.time(),
             })
 
         except Exception as e:
             print(f'❌ Erro na tradução {translation_id}: {e}')
-            td.update({'status': 'error', 'error': str(e)})
+            td.update({'status': 'error', 'error': str(e), 'finished_at': time.time()})
 
         finally:
             try:
@@ -267,6 +282,17 @@ class TranslationService:
             else:
                 result.append(f'[TRADUZIDO] {line}')
         return '\n'.join(result)
+
+    def _cleanup_old_translations(self):
+        """Remove traduções com mais de 1h do dicionário em memória."""
+        now = time.time()
+        to_delete = [
+            tid for tid, data in self.active_translations.items()
+            if data.get('status') in ('completed', 'error', 'cancelled')
+            and now - data.get('finished_at', now) > 3600
+        ]
+        for tid in to_delete:
+            del self.active_translations[tid]
 
     def _update_progress(self, translation_id, progress, message=''):
         if translation_id in self.active_translations:

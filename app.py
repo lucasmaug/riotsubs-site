@@ -28,8 +28,9 @@ def create_app():
         response.headers['Content-Security-Policy']  = (
             "default-src 'self'; "
             "script-src 'self' 'unsafe-inline'; "
-            "style-src 'self' 'unsafe-inline'; "
-            "img-src 'self' data:"
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src 'self' https://fonts.gstatic.com; "
+            "img-src 'self' data:;"
         )
         return response
 
@@ -121,6 +122,12 @@ def create_app():
         except Exception as e:
             return jsonify({'error': str(e)}), 500
 
+    # ─── Cancelar tradução ────────────────────────────────────────────────────
+    @app.route('/cancel-translation/<translation_id>', methods=['POST'])
+    def cancel_translation(translation_id):
+        success = translation_service.cancel_translation(translation_id)
+        return jsonify({'success': success})
+
     # ─── Status via Server-Sent Events ───────────────────────────────────────
     @app.route('/translation-stream/<translation_id>')
     def translation_stream(translation_id):
@@ -160,7 +167,7 @@ def create_app():
                 translated_content = translation_service.translate(srt_content, lang=lang)
 
                 translated_filename = file_service.save_translated_file(
-                    translated_content, unique_filename, lang=lang
+                    translated_content, original_filename, lang=lang
                 )
 
                 return jsonify({
