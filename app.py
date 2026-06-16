@@ -50,6 +50,10 @@ def create_app():
     def termos():
         return render_template('termos-e-privacidade.html')
 
+    @app.route('/ping')
+    def ping():
+        return 'OK', 200
+
     # ─── Iniciar tradução ─────────────────────────────────────────────────────
     @app.route('/start-translation', methods=['POST'])
     def start_translation():
