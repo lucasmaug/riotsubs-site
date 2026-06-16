@@ -61,10 +61,10 @@ def create_app():
             file_service.cleanup_old_files(max_age_hours=24)
 
             uploaded_file     = request.files.get('srt_file')
-            original_filename = validation_service.validate_file_upload(uploaded_file)
+            safe_filename, original_filename = validation_service.validate_file_upload(uploaded_file)
 
             filepath, unique_filename = file_service.save_uploaded_file(
-                uploaded_file, original_filename
+                uploaded_file, safe_filename
             )
 
             # Parâmetros de tradução enviados pelo frontend
@@ -138,10 +138,10 @@ def create_app():
     def handle_upload():
         try:
             uploaded_file     = request.files.get('srt_file')
-            original_filename = validation_service.validate_file_upload(uploaded_file)
+            safe_filename, original_filename = validation_service.validate_file_upload(uploaded_file)
 
             filepath, unique_filename = file_service.save_uploaded_file(
-                uploaded_file, original_filename
+                uploaded_file, safe_filename
             )
 
             try:
@@ -175,6 +175,9 @@ def create_app():
         # Aceita nomes com colchetes, hífens, pontos, underscores e espaços — mas sem barras
         if not re.match(r'^[\w\-\.\[\] ]+\.srt$', filename):
             abort(400)
+        # Monta nome de exibição: remove prefixo único e restaura espaços
+        display_name = re.sub(r'^traduzido_[a-f0-9]{8}_', '', filename)
+        display_name = display_name.replace('_', ' ')
 
         response = send_from_directory(
             Config.UPLOAD_FOLDER,
@@ -183,7 +186,7 @@ def create_app():
             mimetype='text/plain; charset=utf-8',
         )
         response.headers['Content-Disposition'] = (
-            f"attachment; filename=\"{filename}\"; filename*=UTF-8''{filename}"
+            f"attachment; filename=\"{display_name}\"; filename*=UTF-8''{display_name}"
         )
         response.headers['Cache-Control'] = 'no-store'
         return response

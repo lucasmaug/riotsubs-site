@@ -37,7 +37,8 @@ class ValidationService:
             mb = self.max_file_size / (1024 * 1024)
             raise ValueError(f'Arquivo muito grande. Limite: {mb:.0f}MB.')
 
-        return secure_filename(uploaded_file.filename)
+        original_filename = uploaded_file.filename
+        return secure_filename(original_filename), original_filename
 
     def validate_srt_content(self, content):
         """
