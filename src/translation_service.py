@@ -122,6 +122,7 @@ class TranslationService:
 
             results        = {}
             failed_chunks  = 0
+            failed_details = []
             done_count     = 0
             lock           = threading.Lock()
 
@@ -156,6 +157,10 @@ class TranslationService:
                         results[index] = translated_text
                         if translated_text == chunks[index]:
                             failed_chunks += 1
+                            failed_details.append({
+                                'chunk_index': index,
+                                'original_text': chunks[index],
+                            })
                         done_count += 1
                         td['chunks_processed'] = done_count
 
@@ -194,6 +199,7 @@ class TranslationService:
                 'translated_filename': translated_filename,
                 'download_url':        f'/download/{quote(translated_filename)}',
                 'failed_chunks':       failed_chunks,
+                'failed_details':      failed_details,
                 'finished_at':         time.time(),
             })
 

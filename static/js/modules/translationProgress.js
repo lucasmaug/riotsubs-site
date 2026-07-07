@@ -1,3 +1,5 @@
+import { showReviewScreen } from './reviewCorrections.js';
+
 export function setupTranslationProgress() {
   const stepOptions  = document.getElementById('step-options');
   const stepProgress = document.getElementById('step-progress');
@@ -8,7 +10,6 @@ export function setupTranslationProgress() {
   document.getElementById('translate-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // Lê os campos do formulário
     const fileUpload  = document.getElementById('file-upload');
     const lang        = document.getElementById('lang')?.value || '';
     const mediaType   = document.getElementById('media-type')?.value || '';
@@ -18,7 +19,6 @@ export function setupTranslationProgress() {
     if (!file) { alert('Nenhum arquivo selecionado.'); return; }
     if (!lang)  { alert('Selecione o idioma de destino.'); return; }
 
-    // Transição para a tela de progresso
     stepOptions.classList.add('hidden');
     stepProgress.classList.remove('hidden');
 
@@ -27,7 +27,7 @@ export function setupTranslationProgress() {
         file, lang, mediaType, instructions, (id) => { currentTranslationId = id; }
       );
 
-      if (response.success) {
+      if (response.success && !response.skipFinalScreen) {
         const outputName = response.translated_filename || file.name;
 
         const downloadLink = document.getElementById('download-link');
@@ -39,7 +39,7 @@ export function setupTranslationProgress() {
 
         stepProgress.classList.add('hidden');
         stepFinal.classList.remove('hidden');
-      } else {
+      } else if (!response.success) {
         throw new Error(response.error || 'Erro desconhecido.');
       }
 
@@ -59,7 +59,6 @@ export function setupTranslationProgress() {
   document.getElementById('restart-process').addEventListener('click', () => location.reload());
 }
 
-// ─── Upload + início da tradução assíncrona ───────────────────────────────────
 async function uploadFileWithProgress(file, lang, mediaType, instructions, onStarted) {
   const formData = new FormData();
   formData.append('srt_file', file);
@@ -80,7 +79,6 @@ async function uploadFileWithProgress(file, lang, mediaType, instructions, onSta
   return monitorTranslationProgress(startData.translation_id);
 }
 
-// ─── Polling de progresso ─────────────────────────────────────────────────────
 function monitorTranslationProgress(translationId) {
   return new Promise((resolve, reject) => {
     const check = async () => {
@@ -90,7 +88,6 @@ function monitorTranslationProgress(translationId) {
 
         if (status.error) { reject(new Error(status.error)); return; }
 
-        // Atualiza barra de progresso
         const fill = document.getElementById('progress-fill');
         if (fill) {
           const pct = status.progress ?? 0;
@@ -98,16 +95,27 @@ function monitorTranslationProgress(translationId) {
           fill.textContent  = pct + '%';
         }
 
-        // Atualiza mensagem de status
         const msg = document.getElementById('progress-message');
         if (msg && status.message) msg.textContent = status.message;
 
         if (status.status === 'completed') {
-          resolve({
-            success:             true,
-            download_url:        status.download_url,
-            translated_filename: status.translated_filename,
-          });
+          const hasFailed = status.failed_details && status.failed_details.length > 0;
+
+          if (hasFailed) {
+            showReviewScreen(
+              translationId,
+              status.failed_details,
+              status.download_url,
+              status.translated_filename
+            );
+            resolve({ success: true, skipFinalScreen: true });
+          } else {
+            resolve({
+              success:             true,
+              download_url:        status.download_url,
+              translated_filename: status.translated_filename,
+            });
+          }
         } else if (status.status === 'error') {
           reject(new Error(status.error || 'Erro na tradução.'));
         } else if (status.status === 'cancelled') {

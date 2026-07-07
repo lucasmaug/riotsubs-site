@@ -300,3 +300,60 @@ textarea.textarea {
   padding-left: 1.5rem;
   margin-bottom: 2rem;
 }
+
+/* Tela de revisão */
+.review-block {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.review-block-header {
+  font-size: 0.8rem;
+  color: #888;
+  font-family: 'Sora', monospace;
+  margin-bottom: 0.5rem;
+}
+
+.review-block-original {
+  background: #fafafa;
+  border-left: 3px solid #e0e0e0;
+  padding: 0.5rem 0.75rem;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 0.75rem;
+  border-radius: 0 4px 4px 0;
+  white-space: pre-wrap;
+}
+
+.review-block-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0.4rem;
+  font-family: 'Epilogue', sans-serif;
+}
+
+.review-block textarea {
+  width: 100%;
+  min-height: 80px;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.9rem;
+  padding: 0.6rem;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  resize: vertical;
+  color: #1a1a1a;
+  box-sizing: border-box;
+}
+
+.review-count {
+  font-family: 'Sora', sans-serif;
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 1.5rem;
+}

@@ -2,6 +2,7 @@ import os
 import re
 import json
 import time
+from urllib.parse import quote
 from flask import Flask, render_template, request, jsonify, send_from_directory, Response, stream_with_context, abort
 from src.config import Config
 from src.validation_service import ValidationService
@@ -117,6 +118,8 @@ def create_app():
                 'error':               status.get('error'),
                 'chunks_processed':    status.get('chunks_processed'),
                 'total_chunks':        status.get('total_chunks'),
+                'failed_chunks':       status.get('failed_chunks', 0),
+                'failed_details':      status.get('failed_details', []),
             })
 
         except Exception as e:
@@ -127,6 +130,44 @@ def create_app():
     def cancel_translation(translation_id):
         success = translation_service.cancel_translation(translation_id)
         return jsonify({'success': success})
+
+    @app.route('/apply-corrections/<translation_id>', methods=['POST'])
+    def apply_corrections(translation_id):
+        try:
+            data = request.get_json()
+            corrections = data.get('corrections', [])
+
+            status = translation_service.get_translation_status(translation_id)
+            if not status or status.get('status') != 'completed':
+                return jsonify({'error': 'Tradução não encontrada ou não concluída'}), 404
+
+            translated_filename = status.get('translated_filename')
+            translated_path = os.path.join(Config.UPLOAD_FOLDER, translated_filename)
+
+            with open(translated_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            for correction in corrections:
+                original_block = correction.get('original_text', '').strip()
+                corrected_text = correction.get('corrected_text', '').strip()
+
+                if original_block and corrected_text and original_block in content:
+                    content = content.replace(original_block, corrected_text, 1)
+
+            corrected_filename = translated_filename.replace('.srt', '-corrigido.srt')
+            corrected_path = os.path.join(Config.UPLOAD_FOLDER, corrected_filename)
+
+            with open(corrected_path, 'w', encoding='utf-8', newline='\n') as f:
+                f.write(content)
+
+            return jsonify({
+                'success':            True,
+                'download_url':       f'/download/{quote(corrected_filename)}',
+                'corrected_filename': corrected_filename,
+            })
+
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
 
     # ─── Status via Server-Sent Events ───────────────────────────────────────
     @app.route('/translation-stream/<translation_id>')

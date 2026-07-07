@@ -120,6 +120,28 @@
       <button id="cancel-progress" class="btn btn-secondary">Cancelar tradução</button>
     </section>
 
+    <!-- Etapa 3.5: Revisão de blocos com falha -->
+    <section id="step-review" class="hidden">
+      <h2>Revisão necessária</h2>
+      <p class="subtitle">
+        Alguns blocos não foram traduzidos automaticamente.
+        Revise e corrija abaixo, depois baixe o arquivo final.
+      </p>
+
+      <div id="review-blocks">
+        <!-- Blocos gerados dinamicamente pelo JS -->
+      </div>
+
+      <div class="translate-button">
+        <button id="apply-corrections-btn" class="btn btn-primary">
+          Baixar com correções
+        </button>
+        <button id="skip-corrections-btn" class="btn btn-secondary">
+          Baixar sem corrigir
+        </button>
+      </div>
+    </section>
+
     <!-- Etapa 4: Final -->
     <section id="step-final" class="hidden">
       <h2>Tradução feita com sucesso!</h2>
