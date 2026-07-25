@@ -257,13 +257,14 @@ class TranslationService:
         user_content += f'\n\n{chunk_content}'
 
         payload = {
-            'model': 'deepseek-chat',
+            'model': 'deepseek-v4-flash',
             'messages': [
                 {'role': 'system', 'content': system_prompt},
                 {'role': 'user',   'content': user_content},
             ],
             'temperature': 0.1,
             'max_tokens':  2000,
+            'thinking':    {'type': 'disabled'},
         }
 
         print(f'📤 Enviando chunk ({len(chunk_content)} chars) → {lang_name}...')
